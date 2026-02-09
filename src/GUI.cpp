@@ -24,6 +24,7 @@ GUI::GUI(int width, int height, const char* title)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  setupCallbacks();
   m_shader.load("shaders/default.vert", "shaders/default.frag");
   initMeshes();
 }
@@ -83,6 +84,14 @@ void GUI::beginFrame() {
 
 void GUI::endFrame() {
   glfwSwapBuffers(m_window);
+
+  // Clear per-frame input state before polling new events
+  m_keysJustPressed.clear();
+  m_keysJustReleased.clear();
+  m_mouseButtonsJustPressed.clear();
+  m_mouseButtonsJustReleased.clear();
+  m_scrollDelta = glm::vec2(0.0f);
+
   glfwPollEvents();
 }
 
@@ -142,4 +151,91 @@ void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::vec3 color) {
 
   setupDraw(model, color);
   m_cubeMesh.draw();
+}
+
+// --- Callbacks ---
+
+void GUI::setupCallbacks() {
+  glfwSetWindowUserPointer(m_window, this);
+  glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
+  glfwSetKeyCallback(m_window, keyCallback);
+  glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
+  glfwSetScrollCallback(m_window, scrollCallback);
+}
+
+void GUI::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+  GUI* gui = static_cast<GUI*>(glfwGetWindowUserPointer(window));
+  gui->m_width = width;
+  gui->m_height = height;
+  glViewport(0, 0, width, height);
+}
+
+void GUI::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+  (void)scancode; (void)mods;
+  GUI* gui = static_cast<GUI*>(glfwGetWindowUserPointer(window));
+
+  if (action == GLFW_PRESS) {
+    gui->m_keysPressed.insert(key);
+    gui->m_keysJustPressed.insert(key);
+  } else if (action == GLFW_RELEASE) {
+    gui->m_keysPressed.erase(key);
+    gui->m_keysJustReleased.insert(key);
+  }
+}
+
+void GUI::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+  (void)mods;
+  GUI* gui = static_cast<GUI*>(glfwGetWindowUserPointer(window));
+
+  if (action == GLFW_PRESS) {
+    gui->m_mouseButtonsPressed.insert(button);
+    gui->m_mouseButtonsJustPressed.insert(button);
+  } else if (action == GLFW_RELEASE) {
+    gui->m_mouseButtonsPressed.erase(button);
+    gui->m_mouseButtonsJustReleased.insert(button);
+  }
+}
+
+void GUI::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+  GUI* gui = static_cast<GUI*>(glfwGetWindowUserPointer(window));
+  gui->m_scrollDelta.x += static_cast<float>(xoffset);
+  gui->m_scrollDelta.y += static_cast<float>(yoffset);
+}
+
+// --- Keyboard input ---
+
+bool GUI::isKeyPressed(int key) const {
+  return m_keysPressed.count(key) > 0;
+}
+
+bool GUI::isKeyJustPressed(int key) const {
+  return m_keysJustPressed.count(key) > 0;
+}
+
+bool GUI::isKeyJustReleased(int key) const {
+  return m_keysJustReleased.count(key) > 0;
+}
+
+// --- Mouse input ---
+
+glm::vec2 GUI::getMousePosition() const {
+  double x, y;
+  glfwGetCursorPos(m_window, &x, &y);
+  return glm::vec2(static_cast<float>(x), static_cast<float>(y));
+}
+
+bool GUI::isMouseButtonPressed(int button) const {
+  return m_mouseButtonsPressed.count(button) > 0;
+}
+
+bool GUI::isMouseButtonJustPressed(int button) const {
+  return m_mouseButtonsJustPressed.count(button) > 0;
+}
+
+bool GUI::isMouseButtonJustReleased(int button) const {
+  return m_mouseButtonsJustReleased.count(button) > 0;
+}
+
+glm::vec2 GUI::getScrollDelta() const {
+  return m_scrollDelta;
 }

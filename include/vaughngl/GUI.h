@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <string>
+#include <unordered_set>
 
 class GUI {
 public:
@@ -34,16 +35,36 @@ public:
   void setLighting(bool enabled) { m_useLighting = enabled; }
   void setLightDirection(glm::vec3 dir) { m_lightDir = glm::normalize(dir); }
 
+  // Keyboard input
+  bool isKeyPressed(int key) const;
+  bool isKeyJustPressed(int key) const;
+  bool isKeyJustReleased(int key) const;
+
+  // Mouse input
+  glm::vec2 getMousePosition() const;
+  bool isMouseButtonPressed(int button) const;
+  bool isMouseButtonJustPressed(int button) const;
+  bool isMouseButtonJustReleased(int button) const;
+  glm::vec2 getScrollDelta() const;
+
   Camera camera;
 
   int getWidth() const { return m_width; }
   int getHeight() const { return m_height; }
+  float getAspect() const { return static_cast<float>(m_width) / m_height; }
   GLFWwindow* getWindow() const { return m_window; }
 
 private:
   void initGL();
   void initMeshes();
+  void setupCallbacks();
   void setupDraw(const glm::mat4& model, glm::vec3 color);
+
+  // GLFW callbacks
+  static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+  static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+  static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+  static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
   GLFWwindow* m_window = nullptr;
   int m_width, m_height;
@@ -57,6 +78,15 @@ private:
 
   bool m_useLighting = true;
   glm::vec3 m_lightDir{0.5f, 1.0f, 0.3f};
+
+  // Input state
+  std::unordered_set<int> m_keysPressed;
+  std::unordered_set<int> m_keysJustPressed;
+  std::unordered_set<int> m_keysJustReleased;
+  std::unordered_set<int> m_mouseButtonsPressed;
+  std::unordered_set<int> m_mouseButtonsJustPressed;
+  std::unordered_set<int> m_mouseButtonsJustReleased;
+  glm::vec2 m_scrollDelta{0.0f, 0.0f};
 };
 
 #endif
