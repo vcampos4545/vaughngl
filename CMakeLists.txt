@@ -68,15 +68,17 @@ install(FILES
   DESTINATION lib/cmake/${PROJECT_NAME}
 )
 
-# Example executable
-option(VAUGHNGL_BUILD_EXAMPLE "Build example" ON)
-if(VAUGHNGL_BUILD_EXAMPLE)
-  add_executable(example examples/example.cpp)
-  target_link_libraries(example ${PROJECT_NAME})
+# Only build example when this is the top-level project
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  option(VAUGHNGL_BUILD_EXAMPLE "Build example" ON)
+  if(VAUGHNGL_BUILD_EXAMPLE)
+    add_executable(example examples/example.cpp)
+    target_link_libraries(example ${PROJECT_NAME})
 
-  # Copy models to build directory
-  add_custom_command(TARGET example POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/examples/models $<TARGET_FILE_DIR:example>/models
-  )
+    # Copy models to build directory
+    add_custom_command(TARGET example POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_directory
+      ${CMAKE_CURRENT_SOURCE_DIR}/examples/models $<TARGET_FILE_DIR:example>/models
+    )
+  endif()
 endif()
