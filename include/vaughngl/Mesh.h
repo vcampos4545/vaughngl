@@ -43,6 +43,7 @@ namespace MeshGen {
   void quad(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
   void cube(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
   void sphere(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int rings = 16, int sectors = 32);
+  void cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int segments = 32);
 }
 
 #endif

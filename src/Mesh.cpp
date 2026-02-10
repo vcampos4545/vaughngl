@@ -219,4 +219,87 @@ void sphere(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, i
   }
 }
 
+void cylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, int segments) {
+  vertices.clear();
+  indices.clear();
+
+  // Unit cylinder: radius 0.5, height 1, centered at origin, extending along Y-axis
+  const float radius = 0.5f;
+  const float halfHeight = 0.5f;
+
+  // Top cap center
+  unsigned int topCenterIdx = vertices.size();
+  vertices.push_back({{0, halfHeight, 0}, {0, 1, 0}, {0.5f, 0.5f}});
+
+  // Top cap ring
+  unsigned int topRingStart = vertices.size();
+  for (int i = 0; i <= segments; ++i) {
+    float angle = 2.0f * PI * i / segments;
+    float x = radius * cos(angle);
+    float z = radius * sin(angle);
+    vertices.push_back({{x, halfHeight, z}, {0, 1, 0}, {(cos(angle) + 1) * 0.5f, (sin(angle) + 1) * 0.5f}});
+  }
+
+  // Top cap triangles
+  for (int i = 0; i < segments; ++i) {
+    indices.push_back(topCenterIdx);
+    indices.push_back(topRingStart + i + 1);
+    indices.push_back(topRingStart + i);
+  }
+
+  // Bottom cap center
+  unsigned int bottomCenterIdx = vertices.size();
+  vertices.push_back({{0, -halfHeight, 0}, {0, -1, 0}, {0.5f, 0.5f}});
+
+  // Bottom cap ring
+  unsigned int bottomRingStart = vertices.size();
+  for (int i = 0; i <= segments; ++i) {
+    float angle = 2.0f * PI * i / segments;
+    float x = radius * cos(angle);
+    float z = radius * sin(angle);
+    vertices.push_back({{x, -halfHeight, z}, {0, -1, 0}, {(cos(angle) + 1) * 0.5f, (sin(angle) + 1) * 0.5f}});
+  }
+
+  // Bottom cap triangles (reversed winding)
+  for (int i = 0; i < segments; ++i) {
+    indices.push_back(bottomCenterIdx);
+    indices.push_back(bottomRingStart + i);
+    indices.push_back(bottomRingStart + i + 1);
+  }
+
+  // Side surface - top ring vertices (with outward normals)
+  unsigned int sideTopStart = vertices.size();
+  for (int i = 0; i <= segments; ++i) {
+    float angle = 2.0f * PI * i / segments;
+    float x = cos(angle);
+    float z = sin(angle);
+    vertices.push_back({{x * radius, halfHeight, z * radius}, {x, 0, z}, {(float)i / segments, 1}});
+  }
+
+  // Side surface - bottom ring vertices (with outward normals)
+  unsigned int sideBottomStart = vertices.size();
+  for (int i = 0; i <= segments; ++i) {
+    float angle = 2.0f * PI * i / segments;
+    float x = cos(angle);
+    float z = sin(angle);
+    vertices.push_back({{x * radius, -halfHeight, z * radius}, {x, 0, z}, {(float)i / segments, 0}});
+  }
+
+  // Side surface triangles
+  for (int i = 0; i < segments; ++i) {
+    unsigned int top0 = sideTopStart + i;
+    unsigned int top1 = sideTopStart + i + 1;
+    unsigned int bot0 = sideBottomStart + i;
+    unsigned int bot1 = sideBottomStart + i + 1;
+
+    indices.push_back(top0);
+    indices.push_back(bot0);
+    indices.push_back(bot1);
+
+    indices.push_back(top0);
+    indices.push_back(bot1);
+    indices.push_back(top1);
+  }
+}
+
 }

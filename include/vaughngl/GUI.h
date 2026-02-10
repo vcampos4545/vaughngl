@@ -11,13 +11,14 @@
 #include <string>
 #include <unordered_set>
 
-class GUI {
+class GUI
+{
 public:
-  GUI(int width, int height, const char* title = "GUI Window");
+  GUI(int width, int height, const char *title = "GUI Window");
   ~GUI();
 
-  GUI(const GUI&) = delete;
-  GUI& operator=(const GUI&) = delete;
+  GUI(const GUI &) = delete;
+  GUI &operator=(const GUI &) = delete;
 
   bool shouldClose() const;
   void beginFrame();
@@ -37,17 +38,19 @@ public:
   void drawCube(glm::vec3 pos, float size, glm::quat rotation, glm::vec3 color = {1, 1, 1});
   void drawBox(glm::vec3 pos, glm::vec3 size, glm::vec3 color = {1, 1, 1});
   void drawBox(glm::vec3 pos, glm::vec3 size, glm::quat rotation, glm::vec3 color = {1, 1, 1});
+  void drawCylinder(glm::vec3 pos, float radius, float length, glm::vec3 color = {1, 1, 1});
+  void drawCylinder(glm::vec3 pos, float radius, float length, glm::quat rotation, glm::vec3 color = {1, 1, 1});
 
   // OBJ mesh drawing (uses material colors from the mesh)
-  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale = 1.0f);
-  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::quat rotation);
-  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale);
-  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation);
+  void drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, float scale = 1.0f);
+  void drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, float scale, glm::quat rotation);
+  void drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, glm::vec3 scale);
+  void drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation);
   // OBJ mesh with color override (ignores material colors)
-  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::vec3 color);
-  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::quat rotation, glm::vec3 color);
-  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::vec3 color);
-  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation, glm::vec3 color);
+  void drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, float scale, glm::vec3 color);
+  void drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, float scale, glm::quat rotation, glm::vec3 color);
+  void drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, glm::vec3 scale, glm::vec3 color);
+  void drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation, glm::vec3 color);
 
   // Lighting control
   void setLighting(bool enabled) { m_useLighting = enabled; }
@@ -70,21 +73,21 @@ public:
   int getWidth() const { return m_width; }
   int getHeight() const { return m_height; }
   float getAspect() const { return static_cast<float>(m_width) / m_height; }
-  GLFWwindow* getWindow() const { return m_window; }
+  GLFWwindow *getWindow() const { return m_window; }
 
 private:
   void initGL();
   void initMeshes();
   void setupCallbacks();
-  void setupDraw(const glm::mat4& model, glm::vec3 color);
+  void setupDraw(const glm::mat4 &model, glm::vec3 color);
 
   // GLFW callbacks
-  static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-  static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-  static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-  static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+  static void framebufferSizeCallback(GLFWwindow *window, int width, int height);
+  static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+  static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+  static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 
-  GLFWwindow* m_window = nullptr;
+  GLFWwindow *m_window = nullptr;
   int m_width, m_height;
 
   Shader m_shader;
@@ -92,6 +95,7 @@ private:
   Mesh m_quadMesh;
   Mesh m_cubeMesh;
   Mesh m_sphereMesh;
+  Mesh m_cylinderMesh;
   Mesh m_lineMesh;
 
   bool m_useLighting = true;

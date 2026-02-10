@@ -5,19 +5,22 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-GUI::GUI(int width, int height, const char* title)
-    : m_width(width), m_height(height) {
+GUI::GUI(int width, int height, const char *title)
+    : m_width(width), m_height(height)
+{
   initGL();
 
   m_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
-  if (!m_window) {
+  if (!m_window)
+  {
     glfwTerminate();
     throw std::runtime_error("Failed to create window");
   }
 
   glfwMakeContextCurrent(m_window);
 
-  if (glewInit() != GLEW_OK) {
+  if (glewInit() != GLEW_OK)
+  {
     throw std::runtime_error("Failed to initialize GLEW");
   }
 
@@ -33,13 +36,17 @@ GUI::GUI(int width, int height, const char* title)
   initMeshes();
 }
 
-GUI::~GUI() {
-  if (m_window) glfwDestroyWindow(m_window);
+GUI::~GUI()
+{
+  if (m_window)
+    glfwDestroyWindow(m_window);
   glfwTerminate();
 }
 
-void GUI::initGL() {
-  if (!glfwInit()) {
+void GUI::initGL()
+{
+  if (!glfwInit())
+  {
     throw std::runtime_error("Failed to initialize GLFW");
   }
 
@@ -51,7 +58,8 @@ void GUI::initGL() {
 #endif
 }
 
-void GUI::initMeshes() {
+void GUI::initMeshes()
+{
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
 
@@ -66,13 +74,18 @@ void GUI::initMeshes() {
 
   MeshGen::sphere(vertices, indices, 16, 32);
   m_sphereMesh.upload(vertices, indices);
+
+  MeshGen::cylinder(vertices, indices, 32);
+  m_cylinderMesh.upload(vertices, indices);
 }
 
-bool GUI::shouldClose() const {
+bool GUI::shouldClose() const
+{
   return glfwWindowShouldClose(m_window);
 }
 
-void GUI::beginFrame() {
+void GUI::beginFrame()
+{
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -86,7 +99,8 @@ void GUI::beginFrame() {
   m_shader.setVec3("viewPos", camera.position);
 }
 
-void GUI::endFrame() {
+void GUI::endFrame()
+{
   glfwSwapBuffers(m_window);
 
   // Clear per-frame input state before polling new events
@@ -99,12 +113,14 @@ void GUI::endFrame() {
   glfwPollEvents();
 }
 
-void GUI::setupDraw(const glm::mat4& model, glm::vec3 color) {
+void GUI::setupDraw(const glm::mat4 &model, glm::vec3 color)
+{
   m_shader.setMat4("model", model);
   m_shader.setVec3("color", color);
 }
 
-void GUI::drawCircle(glm::vec3 pos, float radius, glm::vec3 color) {
+void GUI::drawCircle(glm::vec3 pos, float radius, glm::vec3 color)
+{
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = glm::scale(model, glm::vec3(radius));
 
@@ -115,7 +131,8 @@ void GUI::drawCircle(glm::vec3 pos, float radius, glm::vec3 color) {
   m_shader.setBool("useLighting", prevLighting);
 }
 
-void GUI::drawCircle(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 color) {
+void GUI::drawCircle(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 color)
+{
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = model * glm::mat4_cast(rotation);
   model = glm::scale(model, glm::vec3(radius));
@@ -127,7 +144,8 @@ void GUI::drawCircle(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 
   m_shader.setBool("useLighting", prevLighting);
 }
 
-void GUI::drawRect(glm::vec3 pos, float width, float height, glm::vec3 color) {
+void GUI::drawRect(glm::vec3 pos, float width, float height, glm::vec3 color)
+{
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = glm::scale(model, glm::vec3(width, height, 1.0f));
 
@@ -138,7 +156,8 @@ void GUI::drawRect(glm::vec3 pos, float width, float height, glm::vec3 color) {
   m_shader.setBool("useLighting", prevLighting);
 }
 
-void GUI::drawRect(glm::vec3 pos, float width, float height, glm::quat rotation, glm::vec3 color) {
+void GUI::drawRect(glm::vec3 pos, float width, float height, glm::quat rotation, glm::vec3 color)
+{
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = model * glm::mat4_cast(rotation);
   model = glm::scale(model, glm::vec3(width, height, 1.0f));
@@ -150,7 +169,8 @@ void GUI::drawRect(glm::vec3 pos, float width, float height, glm::quat rotation,
   m_shader.setBool("useLighting", prevLighting);
 }
 
-void GUI::drawLine(glm::vec3 start, glm::vec3 end, glm::vec3 color, float width) {
+void GUI::drawLine(glm::vec3 start, glm::vec3 end, glm::vec3 color, float width)
+{
   std::vector<glm::vec3> points = {start, end};
   m_lineMesh.uploadLines(points);
 
@@ -161,7 +181,8 @@ void GUI::drawLine(glm::vec3 start, glm::vec3 end, glm::vec3 color, float width)
   m_shader.setBool("useLighting", m_useLighting);
 }
 
-void GUI::drawSphere(glm::vec3 pos, float radius, glm::vec3 color) {
+void GUI::drawSphere(glm::vec3 pos, float radius, glm::vec3 color)
+{
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = glm::scale(model, glm::vec3(radius * 2.0f)); // mesh is unit diameter
 
@@ -169,7 +190,8 @@ void GUI::drawSphere(glm::vec3 pos, float radius, glm::vec3 color) {
   m_sphereMesh.draw();
 }
 
-void GUI::drawSphere(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 color) {
+void GUI::drawSphere(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 color)
+{
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = model * glm::mat4_cast(rotation);
   model = glm::scale(model, glm::vec3(radius * 2.0f));
@@ -178,15 +200,18 @@ void GUI::drawSphere(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 
   m_sphereMesh.draw();
 }
 
-void GUI::drawCube(glm::vec3 pos, float size, glm::vec3 color) {
+void GUI::drawCube(glm::vec3 pos, float size, glm::vec3 color)
+{
   drawBox(pos, glm::vec3(size), color);
 }
 
-void GUI::drawCube(glm::vec3 pos, float size, glm::quat rotation, glm::vec3 color) {
+void GUI::drawCube(glm::vec3 pos, float size, glm::quat rotation, glm::vec3 color)
+{
   drawBox(pos, glm::vec3(size), rotation, color);
 }
 
-void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::vec3 color) {
+void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::vec3 color)
+{
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = glm::scale(model, size);
 
@@ -194,7 +219,8 @@ void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::vec3 color) {
   m_cubeMesh.draw();
 }
 
-void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::quat rotation, glm::vec3 color) {
+void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::quat rotation, glm::vec3 color)
+{
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = model * glm::mat4_cast(rotation);
   model = glm::scale(model, size);
@@ -203,53 +229,84 @@ void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::quat rotation, glm::vec3 c
   m_cubeMesh.draw();
 }
 
+void GUI::drawCylinder(glm::vec3 pos, float radius, float length, glm::vec3 color)
+{
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = glm::scale(model, glm::vec3(radius * 2.0f, length, radius * 2.0f));
+
+  setupDraw(model, color);
+  m_cylinderMesh.draw();
+}
+
+void GUI::drawCylinder(glm::vec3 pos, float radius, float length, glm::quat rotation, glm::vec3 color)
+{
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = model * glm::mat4_cast(rotation);
+  model = glm::scale(model, glm::vec3(radius * 2.0f, length, radius * 2.0f));
+
+  setupDraw(model, color);
+  m_cylinderMesh.draw();
+}
+
 // --- OBJ Mesh drawing ---
 
-void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale) {
+void GUI::drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, float scale)
+{
   drawOBJMesh(mesh, pos, glm::vec3(scale), glm::quat(1, 0, 0, 0));
 }
 
-void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::quat rotation) {
+void GUI::drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, float scale, glm::quat rotation)
+{
   drawOBJMesh(mesh, pos, glm::vec3(scale), rotation);
 }
 
-void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale) {
+void GUI::drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, glm::vec3 scale)
+{
   drawOBJMesh(mesh, pos, scale, glm::quat(1, 0, 0, 0));
 }
 
-void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation) {
-  if (!mesh.isLoaded()) return;
+void GUI::drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation)
+{
+  if (!mesh.isLoaded())
+    return;
 
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = model * glm::mat4_cast(rotation);
   model = glm::scale(model, scale);
 
-  for (const auto& subMesh : mesh.getSubMeshes()) {
+  for (const auto &subMesh : mesh.getSubMeshes())
+  {
     setupDraw(model, subMesh.material.diffuse);
     subMesh.mesh.draw();
   }
 }
 
-void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::vec3 color) {
+void GUI::drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, float scale, glm::vec3 color)
+{
   drawOBJMesh(mesh, pos, glm::vec3(scale), glm::quat(1, 0, 0, 0), color);
 }
 
-void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::quat rotation, glm::vec3 color) {
+void GUI::drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, float scale, glm::quat rotation, glm::vec3 color)
+{
   drawOBJMesh(mesh, pos, glm::vec3(scale), rotation, color);
 }
 
-void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::vec3 color) {
+void GUI::drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, glm::vec3 scale, glm::vec3 color)
+{
   drawOBJMesh(mesh, pos, scale, glm::quat(1, 0, 0, 0), color);
 }
 
-void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation, glm::vec3 color) {
-  if (!mesh.isLoaded()) return;
+void GUI::drawOBJMesh(OBJMesh &mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation, glm::vec3 color)
+{
+  if (!mesh.isLoaded())
+    return;
 
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
   model = model * glm::mat4_cast(rotation);
   model = glm::scale(model, scale);
 
-  for (const auto& subMesh : mesh.getSubMeshes()) {
+  for (const auto &subMesh : mesh.getSubMeshes())
+  {
     setupDraw(model, color);
     subMesh.mesh.draw();
   }
@@ -257,7 +314,8 @@ void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::quat r
 
 // --- Callbacks ---
 
-void GUI::setupCallbacks() {
+void GUI::setupCallbacks()
+{
   glfwSetWindowUserPointer(m_window, this);
   glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
   glfwSetKeyCallback(m_window, keyCallback);
@@ -265,79 +323,98 @@ void GUI::setupCallbacks() {
   glfwSetScrollCallback(m_window, scrollCallback);
 }
 
-void GUI::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-  GUI* gui = static_cast<GUI*>(glfwGetWindowUserPointer(window));
+void GUI::framebufferSizeCallback(GLFWwindow *window, int width, int height)
+{
+  GUI *gui = static_cast<GUI *>(glfwGetWindowUserPointer(window));
   gui->m_width = width;
   gui->m_height = height;
   glViewport(0, 0, width, height);
 }
 
-void GUI::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  (void)scancode; (void)mods;
-  GUI* gui = static_cast<GUI*>(glfwGetWindowUserPointer(window));
+void GUI::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+  (void)scancode;
+  (void)mods;
+  GUI *gui = static_cast<GUI *>(glfwGetWindowUserPointer(window));
 
-  if (action == GLFW_PRESS) {
+  if (action == GLFW_PRESS)
+  {
     gui->m_keysPressed.insert(key);
     gui->m_keysJustPressed.insert(key);
-  } else if (action == GLFW_RELEASE) {
+  }
+  else if (action == GLFW_RELEASE)
+  {
     gui->m_keysPressed.erase(key);
     gui->m_keysJustReleased.insert(key);
   }
 }
 
-void GUI::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+void GUI::mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
+{
   (void)mods;
-  GUI* gui = static_cast<GUI*>(glfwGetWindowUserPointer(window));
+  GUI *gui = static_cast<GUI *>(glfwGetWindowUserPointer(window));
 
-  if (action == GLFW_PRESS) {
+  if (action == GLFW_PRESS)
+  {
     gui->m_mouseButtonsPressed.insert(button);
     gui->m_mouseButtonsJustPressed.insert(button);
-  } else if (action == GLFW_RELEASE) {
+  }
+  else if (action == GLFW_RELEASE)
+  {
     gui->m_mouseButtonsPressed.erase(button);
     gui->m_mouseButtonsJustReleased.insert(button);
   }
 }
 
-void GUI::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-  GUI* gui = static_cast<GUI*>(glfwGetWindowUserPointer(window));
+void GUI::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
+{
+  GUI *gui = static_cast<GUI *>(glfwGetWindowUserPointer(window));
   gui->m_scrollDelta.x += static_cast<float>(xoffset);
   gui->m_scrollDelta.y += static_cast<float>(yoffset);
 }
 
 // --- Keyboard input ---
 
-bool GUI::isKeyPressed(int key) const {
+bool GUI::isKeyPressed(int key) const
+{
   return m_keysPressed.count(key) > 0;
 }
 
-bool GUI::isKeyJustPressed(int key) const {
+bool GUI::isKeyJustPressed(int key) const
+{
   return m_keysJustPressed.count(key) > 0;
 }
 
-bool GUI::isKeyJustReleased(int key) const {
+bool GUI::isKeyJustReleased(int key) const
+{
   return m_keysJustReleased.count(key) > 0;
 }
 
 // --- Mouse input ---
 
-glm::vec2 GUI::getMousePosition() const {
+glm::vec2 GUI::getMousePosition() const
+{
   double x, y;
   glfwGetCursorPos(m_window, &x, &y);
   return glm::vec2(static_cast<float>(x), static_cast<float>(y));
 }
 
-bool GUI::isMouseButtonPressed(int button) const {
+bool GUI::isMouseButtonPressed(int button) const
+{
   return m_mouseButtonsPressed.count(button) > 0;
 }
 
-bool GUI::isMouseButtonJustPressed(int button) const {
+bool GUI::isMouseButtonJustPressed(int button) const
+{
   return m_mouseButtonsJustPressed.count(button) > 0;
 }
 
-bool GUI::isMouseButtonJustReleased(int button) const {
+bool GUI::isMouseButtonJustReleased(int button) const
+{
   return m_mouseButtonsJustReleased.count(button) > 0;
 }
 
-glm::vec2 GUI::getScrollDelta() const {
+glm::vec2 GUI::getScrollDelta() const
+{
   return m_scrollDelta;
 }
