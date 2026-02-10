@@ -4,6 +4,7 @@
 #include <vaughngl/Shader.h>
 #include <vaughngl/Mesh.h>
 #include <vaughngl/Camera.h>
+#include <vaughngl/OBJMesh.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -36,6 +37,17 @@ public:
   void drawCube(glm::vec3 pos, float size, glm::quat rotation, glm::vec3 color = {1, 1, 1});
   void drawBox(glm::vec3 pos, glm::vec3 size, glm::vec3 color = {1, 1, 1});
   void drawBox(glm::vec3 pos, glm::vec3 size, glm::quat rotation, glm::vec3 color = {1, 1, 1});
+
+  // OBJ mesh drawing (uses material colors from the mesh)
+  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale = 1.0f);
+  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::quat rotation);
+  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale);
+  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation);
+  // OBJ mesh with color override (ignores material colors)
+  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::vec3 color);
+  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::quat rotation, glm::vec3 color);
+  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::vec3 color);
+  void drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation, glm::vec3 color);
 
   // Lighting control
   void setLighting(bool enabled) { m_useLighting = enabled; }

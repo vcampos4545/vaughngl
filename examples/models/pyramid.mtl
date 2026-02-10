@@ -1,0 +1,13 @@
+# Pyramid materials
+
+newmtl gold
+Kd 1.0 0.84 0.0
+Ka 0.2 0.17 0.0
+Ks 1.0 1.0 1.0
+Ns 100.0
+
+newmtl stone
+Kd 0.5 0.5 0.5
+Ka 0.1 0.1 0.1
+Ks 0.3 0.3 0.3
+Ns 10.0

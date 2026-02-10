@@ -13,6 +13,7 @@ add_library(${PROJECT_NAME}
   src/GUI.cpp
   src/Shader.cpp
   src/Mesh.cpp
+  src/OBJMesh.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -70,6 +71,12 @@ install(FILES
 # Example executable
 option(VAUGHNGL_BUILD_EXAMPLE "Build example" ON)
 if(VAUGHNGL_BUILD_EXAMPLE)
-  add_executable(example example.cpp)
+  add_executable(example examples/example.cpp)
   target_link_libraries(example ${PROJECT_NAME})
+
+  # Copy models to build directory
+  add_custom_command(TARGET example POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/examples/models $<TARGET_FILE_DIR:example>/models
+  )
 endif()

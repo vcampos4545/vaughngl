@@ -15,6 +15,12 @@ int main()
   // Spinning cube rotation
   glm::quat spinRotation = glm::quat(1, 0, 0, 0); // identity quaternion
 
+  // Load OBJ model
+  OBJMesh pyramid;
+  if (!pyramid.load("models/pyramid.obj")) {
+    return 1;
+  }
+
   while (!gui.shouldClose())
   {
     gui.beginFrame();
@@ -85,6 +91,9 @@ int main()
 
     // Spinning cube
     gui.drawCube({0, 1, -4}, 0.8f, spinRotation, {1, 0.8f, 0.2f});
+
+    // OBJ model with material colors
+    gui.drawOBJMesh(pyramid, {3, 0, 3}, 2.0f, spinRotation);
 
     gui.endFrame();
   }

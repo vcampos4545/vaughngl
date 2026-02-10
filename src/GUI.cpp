@@ -21,7 +21,9 @@ GUI::GUI(int width, int height, const char* title)
     throw std::runtime_error("Failed to initialize GLEW");
   }
 
-  glViewport(0, 0, width, height);
+  // Get actual framebuffer size (important for Retina/HiDPI displays)
+  glfwGetFramebufferSize(m_window, &m_width, &m_height);
+  glViewport(0, 0, m_width, m_height);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -199,6 +201,58 @@ void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::quat rotation, glm::vec3 c
 
   setupDraw(model, color);
   m_cubeMesh.draw();
+}
+
+// --- OBJ Mesh drawing ---
+
+void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale) {
+  drawOBJMesh(mesh, pos, glm::vec3(scale), glm::quat(1, 0, 0, 0));
+}
+
+void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::quat rotation) {
+  drawOBJMesh(mesh, pos, glm::vec3(scale), rotation);
+}
+
+void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale) {
+  drawOBJMesh(mesh, pos, scale, glm::quat(1, 0, 0, 0));
+}
+
+void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation) {
+  if (!mesh.isLoaded()) return;
+
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = model * glm::mat4_cast(rotation);
+  model = glm::scale(model, scale);
+
+  for (const auto& subMesh : mesh.getSubMeshes()) {
+    setupDraw(model, subMesh.material.diffuse);
+    subMesh.mesh.draw();
+  }
+}
+
+void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::vec3 color) {
+  drawOBJMesh(mesh, pos, glm::vec3(scale), glm::quat(1, 0, 0, 0), color);
+}
+
+void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, float scale, glm::quat rotation, glm::vec3 color) {
+  drawOBJMesh(mesh, pos, glm::vec3(scale), rotation, color);
+}
+
+void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::vec3 color) {
+  drawOBJMesh(mesh, pos, scale, glm::quat(1, 0, 0, 0), color);
+}
+
+void GUI::drawOBJMesh(OBJMesh& mesh, glm::vec3 pos, glm::vec3 scale, glm::quat rotation, glm::vec3 color) {
+  if (!mesh.isLoaded()) return;
+
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = model * glm::mat4_cast(rotation);
+  model = glm::scale(model, scale);
+
+  for (const auto& subMesh : mesh.getSubMeshes()) {
+    setupDraw(model, color);
+    subMesh.mesh.draw();
+  }
 }
 
 // --- Callbacks ---

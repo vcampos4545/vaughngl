@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "OBJMesh.h"
 #include "GUI.h"
 
 #endif
