@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cstdio>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 GUI::GUI(int width, int height, const char* title)
     : m_width(width), m_height(height) {
@@ -112,8 +113,32 @@ void GUI::drawCircle(glm::vec3 pos, float radius, glm::vec3 color) {
   m_shader.setBool("useLighting", prevLighting);
 }
 
+void GUI::drawCircle(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 color) {
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = model * glm::mat4_cast(rotation);
+  model = glm::scale(model, glm::vec3(radius));
+
+  bool prevLighting = m_useLighting;
+  m_shader.setBool("useLighting", false);
+  setupDraw(model, color);
+  m_circleMesh.draw();
+  m_shader.setBool("useLighting", prevLighting);
+}
+
 void GUI::drawRect(glm::vec3 pos, float width, float height, glm::vec3 color) {
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = glm::scale(model, glm::vec3(width, height, 1.0f));
+
+  bool prevLighting = m_useLighting;
+  m_shader.setBool("useLighting", false);
+  setupDraw(model, color);
+  m_quadMesh.draw();
+  m_shader.setBool("useLighting", prevLighting);
+}
+
+void GUI::drawRect(glm::vec3 pos, float width, float height, glm::quat rotation, glm::vec3 color) {
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = model * glm::mat4_cast(rotation);
   model = glm::scale(model, glm::vec3(width, height, 1.0f));
 
   bool prevLighting = m_useLighting;
@@ -142,12 +167,34 @@ void GUI::drawSphere(glm::vec3 pos, float radius, glm::vec3 color) {
   m_sphereMesh.draw();
 }
 
+void GUI::drawSphere(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 color) {
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = model * glm::mat4_cast(rotation);
+  model = glm::scale(model, glm::vec3(radius * 2.0f));
+
+  setupDraw(model, color);
+  m_sphereMesh.draw();
+}
+
 void GUI::drawCube(glm::vec3 pos, float size, glm::vec3 color) {
   drawBox(pos, glm::vec3(size), color);
 }
 
+void GUI::drawCube(glm::vec3 pos, float size, glm::quat rotation, glm::vec3 color) {
+  drawBox(pos, glm::vec3(size), rotation, color);
+}
+
 void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::vec3 color) {
   glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = glm::scale(model, size);
+
+  setupDraw(model, color);
+  m_cubeMesh.draw();
+}
+
+void GUI::drawBox(glm::vec3 pos, glm::vec3 size, glm::quat rotation, glm::vec3 color) {
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
+  model = model * glm::mat4_cast(rotation);
   model = glm::scale(model, size);
 
   setupDraw(model, color);

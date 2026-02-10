@@ -12,6 +12,9 @@ int main()
   glm::vec3 cubePos = {0, 1, 0};
   float moveSpeed = 0.1f;
 
+  // Spinning cube rotation
+  glm::quat spinRotation = glm::quat(1, 0, 0, 0); // identity quaternion
+
   while (!gui.shouldClose())
   {
     gui.beginFrame();
@@ -71,10 +74,17 @@ int main()
       gui.drawLine({i - numLines / 2, 0, numLines / 2}, {i - numLines / 2, 0, -numLines / 2}, {1, 1, 1}, 2.0f);
     }
 
+    // Update spinning cube rotation
+    glm::quat spin = glm::angleAxis(0.02f, glm::normalize(glm::vec3(1, 1, 0)));
+    spinRotation = spin * spinRotation;
+
     // 3D shapes with lighting
     gui.drawSphere({-5, 0, -5}, 0.8f, {1, 0.3f, 0.3f});
     gui.drawCube(cubePos, 1.2f, {0.3f, 1, 0.3f});
     gui.drawBox({5, 0, -5}, {0.5f, 1.5f, 0.5f}, {0.3f, 0.3f, 1});
+
+    // Spinning cube
+    gui.drawCube({0, 1, -4}, 0.8f, spinRotation, {1, 0.8f, 0.2f});
 
     gui.endFrame();
   }

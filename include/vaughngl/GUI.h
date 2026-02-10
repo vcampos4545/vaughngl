@@ -6,6 +6,7 @@
 #include <vaughngl/Camera.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <string>
 #include <unordered_set>
 
@@ -23,13 +24,18 @@ public:
 
   // 2D shapes (drawn in XY plane, can be positioned in 3D)
   void drawCircle(glm::vec3 pos, float radius, glm::vec3 color = {1, 1, 1});
+  void drawCircle(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 color = {1, 1, 1});
   void drawRect(glm::vec3 pos, float width, float height, glm::vec3 color = {1, 1, 1});
+  void drawRect(glm::vec3 pos, float width, float height, glm::quat rotation, glm::vec3 color = {1, 1, 1});
   void drawLine(glm::vec3 start, glm::vec3 end, glm::vec3 color = {1, 1, 1}, float width = 1.0f);
 
   // 3D shapes
   void drawSphere(glm::vec3 pos, float radius, glm::vec3 color = {1, 1, 1});
+  void drawSphere(glm::vec3 pos, float radius, glm::quat rotation, glm::vec3 color = {1, 1, 1});
   void drawCube(glm::vec3 pos, float size, glm::vec3 color = {1, 1, 1});
+  void drawCube(glm::vec3 pos, float size, glm::quat rotation, glm::vec3 color = {1, 1, 1});
   void drawBox(glm::vec3 pos, glm::vec3 size, glm::vec3 color = {1, 1, 1});
+  void drawBox(glm::vec3 pos, glm::vec3 size, glm::quat rotation, glm::vec3 color = {1, 1, 1});
 
   // Lighting control
   void setLighting(bool enabled) { m_useLighting = enabled; }
