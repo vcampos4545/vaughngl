@@ -30,6 +30,7 @@ public:
   void drawRect(glm::vec3 pos, float width, float height, glm::vec3 color = {1, 1, 1});
   void drawRect(glm::vec3 pos, float width, float height, glm::quat rotation, glm::vec3 color = {1, 1, 1});
   void drawLine(glm::vec3 start, glm::vec3 end, glm::vec3 color = {1, 1, 1}, float width = 1.0f);
+  void drawArrow(glm::vec3 start, glm::vec3 end, glm::vec3 color = {1, 1, 1}, float width = 1.0f);
 
   // 3D shapes
   void drawSphere(glm::vec3 pos, float radius, glm::vec3 color = {1, 1, 1});

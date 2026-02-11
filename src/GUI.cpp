@@ -2,6 +2,7 @@
 #include <vaughngl/EmbeddedShaders.h>
 #include <stdexcept>
 #include <cstdio>
+#include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -174,6 +175,62 @@ void GUI::drawLine(glm::vec3 start, glm::vec3 end, glm::vec3 color, float width)
   std::vector<glm::vec3> points = {start, end};
   m_lineMesh.uploadLines(points);
 
+  glLineWidth(width);
+  m_shader.setBool("useLighting", false);
+  setupDraw(glm::mat4(1.0f), color);
+  m_lineMesh.drawLines();
+  m_shader.setBool("useLighting", m_useLighting);
+}
+
+void GUI::drawArrow(glm::vec3 start, glm::vec3 end, glm::vec3 color, float width)
+{
+  glm::vec3 dir = end - start;
+  float length = glm::length(dir);
+  if (length <= 0.0001f)
+    return;
+
+  float headLength = length / 10.0f;
+  float headRadius = headLength / 3.0f;
+
+  glm::vec3 dirNorm = glm::normalize(dir);
+
+  // Clamp head length
+  headLength = glm::min(headLength, length * 0.5f);
+
+  glm::vec3 shaftEnd = end - dirNorm * headLength;
+
+  // Draw shaft
+  drawLine(start, shaftEnd, color, width);
+
+  // Build orthonormal basis for cone
+  glm::vec3 b1, b2;
+  if (std::abs(dirNorm.x) < 0.9f)
+    b1 = glm::normalize(glm::cross(dirNorm, glm::vec3(1, 0, 0)));
+  else
+    b1 = glm::normalize(glm::cross(dirNorm, glm::vec3(0, 1, 0)));
+  b2 = glm::cross(dirNorm, b1);
+
+  // Draw cone edges
+  std::vector<glm::vec3> coneLines;
+  int coneSegments = 12;
+  for (int i = 0; i < coneSegments; ++i)
+  {
+    float a0 = (float)i / coneSegments * glm::two_pi<float>();
+    float a1 = (float)(i + 1) / coneSegments * glm::two_pi<float>();
+
+    glm::vec3 p0 = shaftEnd + (std::cos(a0) * b1 + std::sin(a0) * b2) * headRadius;
+    glm::vec3 p1 = shaftEnd + (std::cos(a1) * b1 + std::sin(a1) * b2) * headRadius;
+
+    // Circle edge
+    coneLines.push_back(p0);
+    coneLines.push_back(p1);
+
+    // Side edge to tip
+    coneLines.push_back(p0);
+    coneLines.push_back(end);
+  }
+
+  m_lineMesh.uploadLines(coneLines);
   glLineWidth(width);
   m_shader.setBool("useLighting", false);
   setupDraw(glm::mat4(1.0f), color);
