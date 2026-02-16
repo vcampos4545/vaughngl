@@ -72,9 +72,12 @@ public:
 
   Camera camera;
 
-  int getWidth() const { return m_width; }
-  int getHeight() const { return m_height; }
-  float getAspect() const { return static_cast<float>(m_width) / m_height; }
+  int getWindowWidth() const { return m_windowWidth; }
+  int getWindowHeight() const { return m_windowHeight; }
+
+  int getFramebufferWidth() const { return m_framebufferWidth; }
+  int getFramebufferHeight() const { return m_framebufferHeight; }
+  float getAspect() const { return static_cast<float>(m_framebufferWidth) / m_framebufferHeight; }
   GLFWwindow *getWindow() const { return m_window; }
 
 private:
@@ -85,12 +88,17 @@ private:
 
   // GLFW callbacks
   static void framebufferSizeCallback(GLFWwindow *window, int width, int height);
+  static void windowSizeCallback(GLFWwindow *window, int width, int height);
   static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
   static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
   static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 
   GLFWwindow *m_window = nullptr;
-  int m_width, m_height;
+  int m_windowWidth;
+  int m_windowHeight;
+
+  int m_framebufferWidth;
+  int m_framebufferHeight;
 
   Shader m_shader;
   Mesh m_circleMesh;

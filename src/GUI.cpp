@@ -7,7 +7,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 GUI::GUI(int width, int height, const char *title)
-    : m_width(width), m_height(height)
+    : m_windowWidth(width), m_windowHeight(height), m_framebufferWidth(width), m_framebufferHeight(height)
 {
   initGL();
 
@@ -25,9 +25,9 @@ GUI::GUI(int width, int height, const char *title)
     throw std::runtime_error("Failed to initialize GLEW");
   }
 
-  // Get actual framebuffer size (important for Retina/HiDPI displays)
-  glfwGetFramebufferSize(m_window, &m_width, &m_height);
-  glViewport(0, 0, m_width, m_height);
+  glfwGetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
+  glfwGetFramebufferSize(m_window, &m_framebufferWidth, &m_framebufferHeight);
+  glViewport(0, 0, m_framebufferWidth, m_framebufferHeight);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -92,7 +92,7 @@ void GUI::beginFrame()
 
   m_shader.use();
 
-  float aspect = (float)m_width / m_height;
+  float aspect = (float)m_framebufferWidth / m_framebufferHeight;
   m_shader.setMat4("view", camera.getViewMatrix());
   m_shader.setMat4("projection", camera.getProjectionMatrix(aspect));
   m_shader.setBool("useLighting", m_useLighting);
@@ -313,11 +313,15 @@ void GUI::drawCylinder(glm::vec3 pos, float radius, float length, glm::vec3 axis
   // Compute rotation from default Y-axis to specified axis
   glm::quat axisRot(1, 0, 0, 0);
   float d = glm::dot(defaultAxis, axis);
-  if (d < 0.9999f) {
-    if (d < -0.9999f) {
+  if (d < 0.9999f)
+  {
+    if (d < -0.9999f)
+    {
       // 180 degree rotation (opposite direction)
       axisRot = glm::angleAxis(glm::pi<float>(), glm::vec3(1, 0, 0));
-    } else {
+    }
+    else
+    {
       glm::vec3 rotAxis = glm::normalize(glm::cross(defaultAxis, axis));
       float angle = acos(d);
       axisRot = glm::angleAxis(angle, rotAxis);
@@ -402,6 +406,7 @@ void GUI::setupCallbacks()
 {
   glfwSetWindowUserPointer(m_window, this);
   glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
+  glfwSetWindowSizeCallback(m_window, windowSizeCallback);
   glfwSetKeyCallback(m_window, keyCallback);
   glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
   glfwSetScrollCallback(m_window, scrollCallback);
@@ -410,9 +415,19 @@ void GUI::setupCallbacks()
 void GUI::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
   GUI *gui = static_cast<GUI *>(glfwGetWindowUserPointer(window));
-  gui->m_width = width;
-  gui->m_height = height;
+
+  gui->m_framebufferWidth = width;
+  gui->m_framebufferHeight = height;
+
   glViewport(0, 0, width, height);
+}
+
+void GUI::windowSizeCallback(GLFWwindow *window, int width, int height)
+{
+  GUI *gui = static_cast<GUI *>(glfwGetWindowUserPointer(window));
+
+  gui->m_windowWidth = width;
+  gui->m_windowHeight = height;
 }
 
 void GUI::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
